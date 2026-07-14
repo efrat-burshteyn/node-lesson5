@@ -8,7 +8,7 @@ app.get('/', (req, res) => {
 app.get('/books', (req, res) => {
   res.send(books);
 })
-app.get('/books:id', (req, res) => {
+app.get('/books/:id', (req, res) => {
     if(books.find(b=>b.id==parseInt(req.params.id))){
         res.send(books.find(b=>b.id==parseInt(req.params.id)));
     }
