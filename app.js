@@ -7,7 +7,10 @@ app.get('/', (req, res) => {
   res.json('Hello Client!!!')
 })
 app.get('/books', (req, res) => {
-  res.json(books);
+  const {search='',limit=5, page=1}= req.query;
+    let returnBook=(books.filter(b=>b.name.includes(search)));
+
+  res.json(returnBook.slice(((+page)-1)*(+limit),((+page)-1)*(+limit)+(+limit)));
 })
 app.get('/books/:id', (req, res) => {
     if(books.find(b=>b.id==parseInt(req.params.id))){
