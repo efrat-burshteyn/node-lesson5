@@ -1,25 +1,68 @@
 import express from 'express';
 import  {books} from './db.js';
-const app = express()
+const app = express();
+app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Hello Client!!!')
+  res.json('Hello Client!!!')
 })
 app.get('/books', (req, res) => {
-  res.send(books);
+  res.json(books);
 })
 app.get('/books/:id', (req, res) => {
     if(books.find(b=>b.id==parseInt(req.params.id))){
-        res.send(books.find(b=>b.id==parseInt(req.params.id)));
+        res.json(books.find(b=>b.id==parseInt(req.params.id)));
     }
     else{
-        res.status(404).send("אין ספר כזה!")
+        res.status(404).send({error:"אין ספר כזה!"})
     }
   
 })
 app.post('/books', (req, res) => {
     books.push(req.body);
-  res.status(201).send("הקובץ נוסף בהצלחה!");
+  res.status(201).json({message:"הקובץ נוסף בהצלחה!"});
+})
+app.patch('/books/:id', (req, res) => {
+
+ if(!books.find(b=>b.id==parseInt(req.params.id))){
+     res.status(404).json({error:"אין כזה קובץ"});
+ } 
+ else{
+  Object.assign(books.find(b=>b.id==parseInt(req.params.id)),req.body);
+  res.json(books.find(b=>b.id==parseInt(req.params.id)))
+ 
+ } 
+})
+app.patch('/books/:id/username', (req, res) => {
+
+ if(!books.find(b=>b.id==parseInt(req.params.id))){
+     res.status(404).json({error: "אין כזה קובץ"});
+ } 
+ else{
+  books.find(b=>b.id==parseInt(req.params.id)).isAvailable=true;
+  res.json(books.find(b=>b.id==parseInt(req.params.id)))
+ 
+ } 
+})
+app.patch('/books/:id/username2', (req, res) => {
+
+ if(!books.find(b=>b.id==parseInt(req.params.id))){
+     res.status(404).json({error: "אין כזה קובץ"});
+ } 
+ else{
+  books.find(b=>b.id==parseInt(req.params.id)).isAvailable=false;
+  res.json(books.find(b=>b.id==parseInt(req.params.id)))
+ 
+ } 
+})
+app.delete('/books/:id', (req, res) => {
+if(books.some(b=>b.id == parseInt(req.params.id))){
+    books=books.filter(b=>b.id !== parseInt(req.params.id))
+    res.status(204).send();
+ } 
+ else{
+  res.status(404).json({error:"אין כזה קובץ"});
+ } 
 })
 
 app.listen(5000, () => {
