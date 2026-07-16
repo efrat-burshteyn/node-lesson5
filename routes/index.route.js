@@ -1,6 +1,6 @@
 import {Router} from "express";
-import bookRouter from './book.route';
-import userRouter from './user.route';
+import bookRouter from './book.route.js';
+import userRouter from './user.route.js';
 const router = Router();
 router.use('/books',bookRouter);
 router.use('/user',userRouter);

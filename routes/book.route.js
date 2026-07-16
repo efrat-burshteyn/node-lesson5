@@ -1,4 +1,4 @@
-import {Routers} from "express";
+import {Router} from "express";
 import { Client, getAllBooks ,getOneBook ,postBook, updateBook ,borrowBook, returnBook ,deleteBook}
 from "../controllers/book.controllers.js";
 const router =Router();

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client</title>
+</head>
+<body>
+    <ul id="all"></ul>
+    <script>
+        onload=async()=>{
+            try{
+                const response=await fetch('http://localhost:5000/api/books/books',{method:'GET'});
+                const obj=await response.json();
+                if(response.ok){
+                    const ul=document.querySelector('#all');
+                    for(let i=0; i<obj.length;i++){
+                        ul.innerHTML+=`<li>${obj[i].name}</li>`;
+                    }
+                }
+                else{
+                    console.log(error);
+                    
+                }
+
+            }
+            catch(error){
+                console.log(error);
+            }
+        };
+    </script>
+    
+</body>
+</html>
