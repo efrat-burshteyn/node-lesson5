@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import express from 'express';
 import mainRouter from "./routes/index.route.js";
-import {reqCurrentDate} from './Middlewares/Middleware.js'
+import {reqCurrentDate,printReqCurrentDate} from './Middlewares/Middleware.js'
 
 const  limiter  =  expressRateLimit ( { 
 	windowMs : 15  *  60 * 1000 ,  // קבועי SECOND, MINUTE, HOUR ו-DAY זמינים, או השתמשו במספר רגיל עבור אלפיות השנייה 
@@ -26,6 +26,7 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(reqCurrentDate);
+app.use(printReqCurrentDate);
 app.use('/api',mainRouter);
 
 
