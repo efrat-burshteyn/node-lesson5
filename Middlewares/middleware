@@ -1,0 +1,4 @@
+export const reqCurrentDate=(req,res,next)=>{
+    req.currentDate= new Date().toLocaleString;
+     next();
+} 
