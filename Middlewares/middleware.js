@@ -9,7 +9,7 @@ export const printReqCurrentDate=(req,res,next)=>{
     next();
 };
 export const error=(err,req,res,next)=>{
-   const errStatus=500 ;
+   const errStatus=err.status||500 ;
    const resError={
     error:{
         message: err.message,
@@ -18,4 +18,9 @@ export const error=(err,req,res,next)=>{
     }
    };
    res.status(errStatus).json(resError);
+};
+export const errorNotFound=(req,res,next)=>{
+    const error=new Error('Route not found');
+    error.status=404;
+    next(error);
 };
