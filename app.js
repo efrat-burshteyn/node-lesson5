@@ -2,7 +2,9 @@
 import helmet from 'helmet';
 //משמשת להגבלת בקשות חוזרות לממשקי API ציבוריים
 import expressRateLimit from 'express-rate-limit';
+//הדפסת נתוני כל בקשה שמגיעה לשרת במצב פיתוח
 import morgan from 'morgan';
+//הוספת אפשרות גישה לשרת מCLIENT
 import cors from 'cors';
 import express from 'express';
 import mainRouter from "./routes/index.route.js";
