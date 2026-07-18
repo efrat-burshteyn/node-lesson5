@@ -4,28 +4,32 @@ import  {users} from '../users.js';
 export const Client=(req, res)=>{
   res.json('Hello Client!!!')
 };
-export const getAllBooks=(req, res)=>{
+export const getAllBooks=(req, res,next)=>{
   const {search='',limit=5, page=1}= req.query;
     let returnBook=(books.filter(b=>b.name.includes(search)));
 
   res.json(returnBook.slice(((+page)-1)*(+limit),((+page)-1)*(+limit)+(+limit)));
 };
-export const getOneBook=(req, res)=>{
+export const getOneBook=(req, res,next)=>{
     if(books.find(b=>b.id==parseInt(req.params.id))){
         res.json(books.find(b=>b.id==parseInt(req.params.id)));
     }
     else{
-        res.status(404).send({error:"אין ספר כזה!"})
+      const error =new Error("אין ספר כזה!");
+      error.status=404;
+      next(error);
     }
-}
-export const postBook=(req, res)=>{
+};
+export const postBook=(req, res,next)=>{
     books.push(req.body);
   res.status(201).json({message:"הספר נוסף בהצלחה!"});
 };
-export const updateBook=(req, res)=>{
+export const updateBook=(req, res,next)=>{
 
  if(!books.find(b=>b.id==parseInt(req.params.id))){
-     res.status(404).json({error:"אין כזה ספר"});
+      const error =new Error("אין ספר כזה!");
+      error.status=404;
+      next(error);
  } 
  else{
   Object.assign(books.find(b=>b.id==parseInt(req.params.id)),req.body);
@@ -33,13 +37,17 @@ export const updateBook=(req, res)=>{
  
  } 
 }
-export const borrowBook=(req, res)=>{
+export const borrowBook=(req, res,next)=>{
  if(!books.find(b=>b.id==parseInt(req.params.id))||!users.find(u=>u.id==parseInt(req.params.userId))){
-    res.status(404).json({error: "אין כזה משתמש או ספר"});
+     const error =new Error("אין ספר/משתמש כזה!");
+      error.status=404;
+      next(error);
      
  } 
  if(books.find(b=>b.id==parseInt(req.params.id)).isAvailable){
-    res.status(404).json({error: "הספר מושאל  "});
+    const error =new Error(" הספר מושאל!");
+      error.status=404;
+      next(error);
  }
  else{
   books.find(b=>b.id==parseInt(req.params.id)).isAvailable=true;
@@ -48,9 +56,11 @@ export const borrowBook=(req, res)=>{
 
  } 
 }
-export const returnBook=(req, res)=>{
+export const returnBook=(req, res,next)=>{
  if(!books.find(b=>b.id==+(req.params.id))||!users.find(u=>u.id==+(req.params.userId))){
-     res.status(404).json({error: "אין כזה ספר או משתמש"});
+      const error =new Error("אין ספר/משתמש כזה!");
+      error.status=404;
+      next(error);
  } 
  else{
   books.find(b=>b.id==parseInt(req.params.id)).isAvailable=false;
@@ -59,12 +69,14 @@ export const returnBook=(req, res)=>{
  
  } 
 };
-export const deleteBook=(req, res)=>{
+export const deleteBook=(req, res,next)=>{
 if(books.some(b=>b.id == parseInt(req.params.id))){
     books=books.filter(b=>b.id !== parseInt(req.params.id))
     res.status(204).send();
  } 
  else{
-  res.status(404).json({error:"אין כזה ספר"});
+     const error =new Error("אין ספר כזה!");
+      error.status=404;
+      next(error);
  } 
 };

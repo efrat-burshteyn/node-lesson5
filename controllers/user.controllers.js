@@ -15,12 +15,14 @@ export const signUp=(req,res)=>{
     users.push(newUser);
     res.status(201).json({massage: "נרשמת בהצלחה!"})
 }
-export const signIn=(req,res)=>{
+export const signIn=(req,res,next)=>{
     const {email , password}=req.body;
     if(users.find(u=>u.password===password && u.email===email)){
-        res.status(200).json({massage: "התחברת בהצלחה!"})
+        res.status(200).json({message: "התחברת בהצלחה!"})
     }
     else{
-        res.status(401).json({error: "לא נמצא משתמש כזה"})
+      const error =new Error("לא נמצא משתמש כזה");
+      error.status=404;
+      next(error);
     }
 };
