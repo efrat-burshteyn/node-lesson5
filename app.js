@@ -1,10 +1,23 @@
 //מוסיפה בכותרת של התגובה מהשרת הוראות אבטחה לדפדפן
 import helmet from 'helmet';
+//משמשת להגבלת בקשות חוזרות לממשקי API ציבוריים
+import expressRateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import cors from 'cors';
 import express from 'express';
 import mainRouter from "./routes/index.route.js";
+
+const  limiter  =  rateLimit ( { 
+	windowMs : 15  *  MINUTE ,  // קבועי SECOND, MINUTE, HOUR ו-DAY זמינים, או השתמשו במספר רגיל עבור אלפיות השנייה 
+	limit : 100 ,  // הגבל כל IP ל-100 בקשות לכל `window` (כאן, לכל 15 דקות). 
+	standardHeaders : 'draft-8' ,  // draft-6: כותרות `RateLimit-*`; draft-7 & draft-8: כותרת `RateLimit` משולבת 
+	legacyHeaders : false ,  // השבת את כותרות `X-RateLimit-*`. 
+	ipv6Subnet : 56 ,  // הגדר ל-60 או 64 כדי להיות פחות אגרסיבי, או 52 או 48 כדי להיות יותר אגרסיבי 
+	// store: ... , // Redis, Memcached וכו'. ראה להלן. 
+} ) 
+
 const app = express();
+app.use(limiter);
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(cors());
