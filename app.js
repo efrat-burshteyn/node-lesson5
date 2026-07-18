@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import express from 'express';
 import mainRouter from "./routes/index.route.js";
-import {reqCurrentDate,printReqCurrentDate} from './Middlewares/Middleware.js'
+import {reqCurrentDate,printReqCurrentDate, error} from './Middlewares/middleware.js'
 
 const  limiter  =  expressRateLimit ( { 
 	windowMs : 15  *  60 * 1000 ,  // קבועי SECOND, MINUTE, HOUR ו-DAY זמינים, או השתמשו במספר רגיל עבור אלפיות השנייה 
@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(reqCurrentDate);
 app.use(printReqCurrentDate);
 app.use('/api',mainRouter);
-
+app.use(error);
 
 app.listen(5000, () => {
   console.log('Server is running on http://localhost:5000')
