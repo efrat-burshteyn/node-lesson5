@@ -16,12 +16,12 @@ router.post('/books',schemas(bookSchema),postBook);
 router.patch('/books/:id',schemas(bookSchema), updateBook);
 
 
-router.patch('/books/:id/borrow/:userId', borrowBook);
+router.patch('/books/:id/borrow/:userId',schemas(bookSchema), borrowBook);
 
 
-router.patch('/books/:id/return/:userId',returnBook);
+router.patch('/books/:id/return/:userId',schemas(bookSchema),returnBook);
 
 
-router.delete('/books/:id',deleteBook);
+router.delete('/books/:id',schemas(bookSchema),deleteBook);
 
 export default router;

@@ -9,11 +9,12 @@ export const printReqCurrentDate=(req,res,next)=>{
     next();
 };
 export const error=(err,req,res,next)=>{
-   const errStatus=err.status||500 ;
+   const errStatus=err.status||500;
+   const Messange=errStatus===400? JSON.parse(err.message):err.message;
    const resError={
     error:{
-        message: err.message,
-        type: 'server error',
+        message: Messange,
+        type: errStatus===400? 'validation error': 'server error',
         ...(process.env.NODE_ENV==='development' ?{stack: err.stack}:{})
     }
    };
