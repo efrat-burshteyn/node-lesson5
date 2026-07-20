@@ -5,7 +5,7 @@ import { Client, getAllBooks ,getOneBook ,postBook, updateBook ,borrowBook, retu
 from "../controllers/book.controllers.js";
 const router =Router();
  
-router.get('/',Client);
+router.get('/',Client);ף,0
 
 router.get('/books',getAllBooks);
 
@@ -15,12 +15,9 @@ router.post('/books',schemas(bookSchema),postBook);
 
 router.patch('/books/:id',schemas(bookSchema), updateBook);
 
-
 router.patch('/books/:id/borrow/:userId',schemas(bookSchema), borrowBook);
 
-
 router.patch('/books/:id/return/:userId',schemas(bookSchema),returnBook);
-
 
 router.delete('/books/:id',schemas(bookSchema),deleteBook);
 
