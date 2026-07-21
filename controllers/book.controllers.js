@@ -1,82 +1,113 @@
-import  {books} from '../db.js';
+import  {Book} from '../models/book.model.js';
 import  {users} from '../users.js';
 
 export const Client=(req, res)=>{
   res.json('Hello Client!!!')
 };
-export const getAllBooks=(req, res,next)=>{
+export const getAllBooks=async(req, res,next)=>{
+  try{
   const {search='',limit=5, page=1}= req.query;
-    let returnBook=(books.filter(b=>b.name.includes(search)));
-
-  res.json(returnBook.slice(((+page)-1)*(+limit),((+page)-1)*(+limit)+(+limit)));
+  const query={name: {$regex: search, $options: 'i'}};
+  const books=await Book.find(query)
+                        .limit(Number(limit))
+                        .skip((Number(page)-1)*Number(limit));
+  res.json(books)
+  }
+  catch(error){
+    next(error);
+  }
 };
-export const getOneBook=(req, res,next)=>{
-    if(books.find(b=>b.id==parseInt(req.params.id))){
-        res.json(books.find(b=>b.id==parseInt(req.params.id)));
-    }
-    else{
+export const getOneBook=async(req, res,next)=>{
+  try{
+    const book= await Book.findById(req.params.id);
+     if(!book){
       const error =new Error("אין ספר כזה!");
       error.status=404;
       next(error);
+     }
+      res.json(book);
+    }
+    catch(error){
+      next(error);
     }
 };
-export const postBook=(req, res,next)=>{
-    books.push(req.body);
-  res.status(201).json({message:"הספר נוסף בהצלחה!"});
+export const postBook=async(req, res,next)=>{
+  try{
+    await Book.create(req.body);
+    res.status(201).json({message:"הספר נוסף בהצלחה!"});
+  }
+    catch(error){
+      next(error);
+    }
 };
-export const updateBook=(req, res,next)=>{
-
- if(!books.find(b=>b.id==parseInt(req.params.id))){
-      const error =new Error("אין ספר כזה!");
+export const updateBook = async(req, res,next)=>{
+try{
+  const updateBook=await Book.findByIdAndUpdate(req.params.id,
+                                               req.body,
+                                              {new: true,runValidators: true});
+  if(!updateBook){
+    const error =new Error("אין ספר כזה!");
       error.status=404;
-      next(error);
- } 
- else{
-  Object.assign(books.find(b=>b.id==parseInt(req.params.id)),req.body);
-  res.json(books.find(b=>b.id==parseInt(req.params.id)))
- 
- } 
+     return next(error);
+  }
+  res.json(updateBook);
 }
-export const borrowBook=(req, res,next)=>{
- if(!books.find(b=>b.id==parseInt(req.params.id))||!users.find(u=>u.id==parseInt(req.params.userId))){
-     const error =new Error("אין ספר/משתמש כזה!");
-      error.status=404;
+   catch(error){
       next(error);
-     
- } 
- if(books.find(b=>b.id==parseInt(req.params.id)).isAvailable){
-    const error =new Error(" הספר מושאל!");
-      error.status=404;
-      next(error);
- }
- else{
-  books.find(b=>b.id==parseInt(req.params.id)).isAvailable=true;
-  users.find(u=>u.id==parseInt(req.params.userId)).borrowedBooks.push(parseInt(req.params.id));
-  res.json(books.find(b=>b.id==parseInt(req.params.id)))
-
- } 
-}
-export const returnBook=(req, res,next)=>{
- if(!books.find(b=>b.id==+(req.params.id))||!users.find(u=>u.id==+(req.params.userId))){
+    }
+  }; 
+export const borrowBook = async(req, res,next)=>{
+  try{
+    const book = await Book.findById(req.params.id);
+    const user = users.find(u=>u.id==parseInt(req.params.userId));
+    if(!book||!user){
       const error =new Error("אין ספר/משתמש כזה!");
       error.status=404;
-      next(error);
- } 
- else{
-  books.find(b=>b.id==parseInt(req.params.id)).isAvailable=false;
-  users.find(u=>u.id==+(req.params.userId)).borrowedBooks=users.find(u=>u.id==+(req.params.userId)).borrowedBooks.filter(id=>id!==parseInt(req.params.id));
-  res.status(200).json(books.find(b=>b.id==parseInt(req.params.id)))
- 
- } 
-};
-export const deleteBook=(req, res,next)=>{
-if(books.some(b=>b.id == parseInt(req.params.id))){
-    books=books.filter(b=>b.id !== parseInt(req.params.id))
-    res.status(204).send();
- } 
- else{
-     const error =new Error("אין ספר כזה!");
+       return next(error);
+    }
+    if(book.isAvailable){
+      const error =new Error(" הספר מושאל!");
       error.status=404;
       next(error);
+    }
+      book.isAvailable=true;
+      await book.save();
+      user.borrowedBooks.push(book._id);
+        res.json(book);
+    } 
+    catch (error){
+      next(error);
+    }
+};
+export const returnBook=async(req, res,next)=>{
+  try{
+    const book = await Book.findById((req.params.id));
+    const user = users.find(u=>u.id==parseInt(req.params.userId));
+   if(!book|| !user){
+      const error =new Error("אין ספר/משתמש כזה!");
+      error.status=404;
+      return next(error);
  } 
+     book.isAvailable=false;
+      await book.save();
+      user.borrowedBooks=user.borrowedBooks.filter(id=>id.toString()!==book.id.toString());
+      res.status(200).json(book)
+    } 
+     catch (error){
+      next(error);
+    }
+};
+export const deleteBook=async(req, res,next)=>{
+  try{
+    const book=await Book.findByIdAndDelete(req.params.id)
+  if(!book){
+    const error =new Error("אין ספר כזה!");
+    error.status=404;
+    return next(error);
+  }
+    res.status(204).send();
+ } 
+    catch (error){
+      next(error); 
+    } 
 };
