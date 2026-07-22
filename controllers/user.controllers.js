@@ -1,28 +1,39 @@
 import { Router } from "express";
-import {users} from "../users.js";
+import {User} from "../models/user.model.js";
 const router =Router();
+  
 
-export const signUp=(req,res)=>{
-    const {username, email , password}=req.body;
-    const newUser={
-        id: users.length+1,
-        username,
-         email ,
-          password,
-          borrowedBooks: []
-        
-    };
-    users.push(newUser);
-    res.status(201).json({massage: "נרשמת בהצלחה!"})
-}
-export const signIn=(req,res,next)=>{
-    const {email , password}=req.body;
-    if(users.find(u=>u.password===password && u.email===email)){
-        res.status(200).json({message: "התחברת בהצלחה!"})
+export const getAllUsers = async(req,res,next)=>{
+    try{
+        const users=await User.find();
+        res.json(users)
     }
-    else{
-      const error =new Error("לא נמצא משתמש כזה");
-      error.status=404;
-      next(error);
+    catch(error){
+        next(error);
+    }
+};
+
+export const signUp = async(req,res,next)=>{
+    try{
+        await User.create(req.body);
+        res.status(201).json({massage: "נרשמת בהצלחה!"});
+    }
+    catch(error){
+        next(error);
+    }  
+};
+export const signIn = async(req,res,next)=>{
+    try{
+        const {email , password}=req.body;
+        const user = await User.findOne({email , password});
+    if(!user){
+        const error =new Error("לא נמצא משתמש כזה");
+        error.status=404;
+        return next(error);
+    }
+     res.status(200).json({message: "התחברת בהצלחה!"})
+    }
+    catch(error){
+        next(error);
     }
 };
